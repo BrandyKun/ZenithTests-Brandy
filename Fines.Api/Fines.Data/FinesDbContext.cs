@@ -1,4 +1,4 @@
-using Fines.Data.Models;
+ using Fines.Data.Models;
 using Fines.Data.Seed;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,7 +26,7 @@ public class FinesDbContext : DbContext
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<FinesEntity>()
-            .HasOne<CustomerEntity>()
+            .HasOne(f => f.Customer)
             .WithMany()
             .HasForeignKey(f => f.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
