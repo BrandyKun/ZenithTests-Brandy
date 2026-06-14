@@ -1,4 +1,5 @@
-﻿using Fines.Data.Models;
+﻿using Fines.Core.Dtos;
+using Fines.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fines.Data;
@@ -12,11 +13,21 @@ public class FinesRepository : IFinesRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<FinesEntity>> GetAllFinesAsync()
+    public async Task<IEnumerable<FinesEntity>> GetAllFinesAsync(FilterRequest filters)
     {
-        return await _context.Fines
+        IQueryable<FinesEntity> query = _context.Fines
             .Include(f => f.Vehicle)
-            .Include(f => f.Customer)
-            .ToListAsync();
+            .Include(f => f.Customer);
+
+        if (filters.FineDate is not null)
+            query = query.Where(x => x.FineDate.Date == filters.FineDate.Value.Date);
+
+        if (filters.FineType is not null)
+            query = query.Where(x => x.FineType == filters.FineType);
+
+        if (!string.IsNullOrWhiteSpace(filters.VehicleRegNo))
+            query = query.Where(f => f.Vehicle.RegistrationNumber == filters.VehicleRegNo);
+
+        return await query.ToListAsync();
     }
 }

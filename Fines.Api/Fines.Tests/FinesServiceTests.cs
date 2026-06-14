@@ -1,3 +1,4 @@
+using Fines.Core.Dtos;
 using Fines.Core.Enums;
 using Fines.Data.Models;
 using Fines.Services;
@@ -21,11 +22,11 @@ namespace Fines.Tests
         {
             // Arrange
             var finesEntities = GetSampleFinesEntities();
-            _mockRepository.Setup(repo => repo.GetAllFinesAsync())
+            _mockRepository.Setup(repo => repo.GetAllFinesAsync(It.IsAny<FilterRequest>()))
                 .ReturnsAsync(finesEntities);
 
             // Act
-            var result = await _service.GetFinesAsync();
+            var result = await _service.GetFinesAsync(new FilterRequest());
 
             // Assert
             var finesList = result.ToList();
@@ -38,14 +39,14 @@ namespace Fines.Tests
         {
             // Arrange
             var finesEntities = GetSampleFinesEntities();
-            _mockRepository.Setup(repo => repo.GetAllFinesAsync())
+            _mockRepository.Setup(repo => repo.GetAllFinesAsync(It.IsAny<FilterRequest>()))
                 .ReturnsAsync(finesEntities);
 
             // Act
-            await _service.GetFinesAsync();
+            await _service.GetFinesAsync(new FilterRequest());
 
             // Assert
-            _mockRepository.Verify(repo => repo.GetAllFinesAsync(), Times.Once);
+            _mockRepository.Verify(repo => repo.GetAllFinesAsync(It.IsAny<FilterRequest>()), Times.Once);
         }
 
         [Fact]
@@ -77,11 +78,11 @@ namespace Fines.Tests
                     Customer = new CustomerEntity { Id = 1, CompanyName = "Acme Ltd" }
                 }
             };
-            _mockRepository.Setup(repo => repo.GetAllFinesAsync())
+            _mockRepository.Setup(repo => repo.GetAllFinesAsync(It.IsAny<FilterRequest>()))
                 .ReturnsAsync(finesEntities);
 
             // Act
-            var result = await _service.GetFinesAsync();
+            var result = await _service.GetFinesAsync(new FilterRequest());
 
             // Assert
             var fine = result.First();
@@ -98,11 +99,11 @@ namespace Fines.Tests
         public async Task GetFinesAsync_WhenNoFines_ReturnsEmptyCollection()
         {
             // Arrange
-            _mockRepository.Setup(repo => repo.GetAllFinesAsync())
+            _mockRepository.Setup(repo => repo.GetAllFinesAsync(It.IsAny<FilterRequest>()))
                 .ReturnsAsync(new List<FinesEntity>());
 
             // Act
-            var result = await _service.GetFinesAsync();
+            var result = await _service.GetFinesAsync(new FilterRequest());
 
             // Assert
             Assert.NotNull(result);
@@ -121,11 +122,11 @@ namespace Fines.Tests
                 new FinesEntity { Id = 4, FineNo = "FN-004", FineDate = DateTime.Now, FineType = FineType.NoInsurance, VehicleId = 4, Vehicle = new VehicleEntity { Id = 4, RegistrationNumber = "REG4" }, VehicleDriverName = "Driver4", CustomerId = 4, Customer = new CustomerEntity { Id = 4, CompanyName = "Customer4" } },
                 new FinesEntity { Id = 5, FineNo = "FN-005", FineDate = DateTime.Now, FineType = FineType.SeatBeltViolation, VehicleId = 5, Vehicle = new VehicleEntity { Id = 5, RegistrationNumber = "REG5" }, VehicleDriverName = "Driver5", CustomerId = 5, Customer = new CustomerEntity { Id = 5, CompanyName = "Customer5" } }
             };
-            _mockRepository.Setup(repo => repo.GetAllFinesAsync())
+            _mockRepository.Setup(repo => repo.GetAllFinesAsync(It.IsAny<FilterRequest>()))
                 .ReturnsAsync(finesEntities);
 
             // Act
-            var result = await _service.GetFinesAsync();
+            var result = await _service.GetFinesAsync(new FilterRequest());
 
             // Assert
             var finesList = result.ToList();
@@ -140,11 +141,11 @@ namespace Fines.Tests
         public async Task GetFinesAsync_WhenRepositoryThrowsException_PropagatesException()
         {
             // Arrange
-            _mockRepository.Setup(repo => repo.GetAllFinesAsync())
+            _mockRepository.Setup(repo => repo.GetAllFinesAsync(It.IsAny<FilterRequest>()))
                 .ThrowsAsync(new Exception("Database error"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<Exception>(() => _service.GetFinesAsync());
+            await Assert.ThrowsAsync<Exception>(() => _service.GetFinesAsync(new FilterRequest()));
         }
 
         private static List<FinesEntity> GetSampleFinesEntities()

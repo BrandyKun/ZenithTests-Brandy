@@ -12,9 +12,9 @@ public class FinesService : IFinesService
         _finesRepository = finesRepository;
     }
 
-    public async Task<IEnumerable<FinesResponse>> GetFinesAsync()
+    public async Task<IEnumerable<FinesResponse>> GetFinesAsync(FilterRequest filters)
     {
-        var fines = await _finesRepository.GetAllFinesAsync();
+        var fines = await _finesRepository.GetAllFinesAsync(filters);
         return fines.Select(MapToResponse);
     }
 
