@@ -1,9 +1,24 @@
 import { useEffect, useState } from "react";
 import { Fine } from "../types/fine";
+import { Filters } from "../types/filters";
 
 const API_URL = "http://localhost:5200/api";
 
-export function useFines() {
+function queryBuilder(filters: Filters) {
+  const filterParams = new URLSearchParams();
+
+  if(filters.fineDate)
+    filterParams.append('Date', filters.fineDate)
+
+  if(filters.fineType)
+    filterParams.append('fineType', filters.fineType)
+
+  if(filters.vehicleRegNo)
+    filterParams.append('vehicleRegNo', filters.vehicleRegNo);
+  return filterParams ? `?${filterParams}` : "";
+}
+
+export function useFines(filters: Filters) {
   const [fines, setFines] = useState<Fine[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +29,7 @@ export function useFines() {
       setError(null);
 
       try {
-        const response = await fetch(`${API_URL}/fines`);
+        const response = await fetch(`${API_URL}/fines${queryBuilder(filters)}`);
 
         if (!response.ok) {
           throw new Error(response.statusText);
@@ -36,7 +51,7 @@ export function useFines() {
     };
 
     fetchFines();
-  }, []);
+  }, [filters.fineDate, filters.fineType, filters.vehicleRegNo]);
 
   return { fines, loading, error };
 }
