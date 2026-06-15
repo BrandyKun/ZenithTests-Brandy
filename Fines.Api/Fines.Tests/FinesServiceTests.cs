@@ -138,6 +138,51 @@ namespace Fines.Tests
         }
 
         [Fact]
+        public async Task GetFinesAsync_ForwardsFilterToRepository()
+        {
+            // Arrange
+            var filter = new FilterRequest
+            {
+                FineType = FineType.Speeding,
+                VehicleRegNo = "ABC123",
+                FineDate = new DateTime(2024, 1, 15)
+            };
+            _mockRepository.Setup(repo => repo.GetAllFinesAsync(It.IsAny<FilterRequest>()))
+                .ReturnsAsync(new List<FinesEntity>());
+
+            // Act
+            await _service.GetFinesAsync(filter);
+
+            // Assert - service must pass the same filter through to the repository
+            _mockRepository.Verify(repo => repo.GetAllFinesAsync(filter), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetFinesAsync_ForwardsFilterValuesUnchanged()
+        {
+            // Arrange
+            var filter = new FilterRequest
+            {
+                FineType = FineType.Parking,
+                VehicleRegNo = "XYZ789",
+                FineDate = new DateTime(2024, 1, 20)
+            };
+            _mockRepository.Setup(repo => repo.GetAllFinesAsync(It.IsAny<FilterRequest>()))
+                .ReturnsAsync(new List<FinesEntity>());
+
+            // Act
+            await _service.GetFinesAsync(filter);
+
+            // Assert - the individual filter values reach the repository intact
+            _mockRepository.Verify(repo => repo.GetAllFinesAsync(
+                It.Is<FilterRequest>(f =>
+                    f.FineType == FineType.Parking &&
+                    f.VehicleRegNo == "XYZ789" &&
+                    f.FineDate == new DateTime(2024, 1, 20))),
+                Times.Once);
+        }
+
+        [Fact]
         public async Task GetFinesAsync_WhenRepositoryThrowsException_PropagatesException()
         {
             // Arrange

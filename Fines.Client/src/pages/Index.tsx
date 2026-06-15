@@ -1,49 +1,23 @@
-import {
-  Button,
-  Collapse,
-  Flex,
-  Group,
-  Loader,
-  NativeSelect,
-  Paper,
-  Table,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { useDisclosure} from "@mantine/hooks";
+import { Group, Loader, Paper, Table, Text } from "@mantine/core";
 import { useFines } from "../hooks/useFines";
 import { FineTypeLabels } from "../enum/fineType";
-import { Filters as FineFiltersType } from "../types/filters";
-import {
-  IconAlertTriangleFilled,
-  IconChevronDown,
-  IconChevronUp,
-  IconFilterFilled,
-} from "@tabler/icons-react";
+import { Filters } from "../types/filters";
+import { FilterSection } from "../components/FilterSection";
+import { IconAlertTriangleFilled } from "@tabler/icons-react";
 import { useState } from "react";
-import { DatePickerInput } from "@mantine/dates";
-
 
 //setting defaults
-const EMPTY_FILTERS: FineFiltersType = {
+const EMPTY_FILTERS: Filters = {
   fineDate: null,
   fineType: "",
   vehicleRegNo: "",
 };
 
 export default function Index() {
-  const [opened, { toggle }] = useDisclosure(false);
-
-  const [filters, setFilters] = useState<FineFiltersType>(EMPTY_FILTERS);
+  const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
 
   const { fines, loading, error } = useFines(filters);
-  const fineTypeOptions = [
-    { value: "", label: "Any" },
-    ...Object.entries(FineTypeLabels).map(([key, label]) => ({
-      value: key,
-      label,
-    })),
-  ];
+
   const rows = fines.map((fine) => (
     <Table.Tr key={fine.id}>
       <Table.Td>{fine.fineNo}</Table.Td>
@@ -59,48 +33,7 @@ export default function Index() {
     <main>
       <h2>Index</h2>
 
-      <Button onClick={toggle} mb="md" variant="subtle">
-        <Group gap="xs">
-          <IconFilterFilled size={16} />
-          <Text>Filters</Text>
-          {opened ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
-        </Group>
-      </Button>
-      <Collapse in={opened}>
-        <Paper shadow="xs" px="xl" py="md" mb="md">
-          <Flex direction="row" gap="md" wrap="wrap">
-            <DatePickerInput
-              flex="0 1 16rem"
-              label="Fine Date"
-              placeholder="Any date"
-              clearable
-              value={filters.fineDate}
-              onChange={(fineDate) => setFilters({ ...filters, fineDate })}
-            />
-            <NativeSelect
-              flex="0 1 16rem"
-              label="Fine Type"
-              data={fineTypeOptions}
-              value={filters.fineType}
-              onChange={(event) =>
-                setFilters({ ...filters, fineType: event.currentTarget.value })
-              }
-            />
-            <TextInput
-              flex="0 1 16rem"
-              label="Vehicle Registration"
-              placeholder="e.g. ABC123"
-              value={filters.vehicleRegNo}
-              onChange={(event) =>
-                setFilters({
-                  ...filters,
-                  vehicleRegNo: event.currentTarget.value,
-                })
-              }
-            />
-          </Flex>
-        </Paper>
-      </Collapse>
+      <FilterSection value={filters} onChange={setFilters} />
 
       <Paper shadow="xs" p="xl">
         {loading ? (
