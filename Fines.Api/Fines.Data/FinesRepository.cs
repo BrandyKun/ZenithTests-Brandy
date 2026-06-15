@@ -26,7 +26,7 @@ public class FinesRepository : IFinesRepository
             query = query.Where(x => x.FineType == filters.FineType);
 
         if (!string.IsNullOrWhiteSpace(filters.VehicleRegNo))
-            query = query.Where(f => f.Vehicle.RegistrationNumber == filters.VehicleRegNo);
+            query = query.Where(f => f.Vehicle.RegistrationNumber.ToLower() == filters.VehicleRegNo.ToLower());
 
         return await query.ToListAsync();
     }

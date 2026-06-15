@@ -8,7 +8,7 @@ function queryBuilder(filters: Filters) {
   const filterParams = new URLSearchParams();
 
   if(filters.fineDate)
-    filterParams.append('Date', filters.fineDate)
+    filterParams.append('fineDate', filters.fineDate)
 
   if(filters.fineType)
     filterParams.append('fineType', filters.fineType)
